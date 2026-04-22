@@ -42,8 +42,98 @@
                     android:gravity="center_horizontal"
                     android:paddingStart="14dp"
                     android:paddingEnd="14dp"
-                    android:paddingTop="18dp"
+                    android:paddingTop="14dp"
                     android:paddingBottom="18dp">
+
+                    <!-- Stats row: total downloads + version -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="14dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:background="@drawable/bg_card"
+                            android:padding="12dp"
+                            android:layout_marginEnd="6dp"
+                            android:elevation="2dp">
+
+                            <ImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:src="@drawable/ic_download" />
+
+                            <LinearLayout
+                                android:layout_marginStart="10dp"
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/statDownloads"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="—"
+                                    android:textSize="15sp"
+                                    android:fontFamily="sans-serif-black"
+                                    android:textColor="?attr/colorOnSurface" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Downloads"
+                                    android:textSize="10sp"
+                                    android:textColor="?attr/colorOnSurfaceVariant" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:background="@drawable/bg_card"
+                            android:padding="12dp"
+                            android:layout_marginStart="6dp"
+                            android:elevation="2dp">
+
+                            <ImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:src="@drawable/ic_sparkle" />
+
+                            <LinearLayout
+                                android:layout_marginStart="10dp"
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/statVersion"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="v1.0.0"
+                                    android:textSize="15sp"
+                                    android:fontFamily="sans-serif-black"
+                                    android:textColor="?attr/colorOnSurface" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Latest version"
+                                    android:textSize="10sp"
+                                    android:textColor="?attr/colorOnSurfaceVariant" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
 
                     <!-- Share panel -->
                     <LinearLayout
@@ -134,16 +224,23 @@
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnStart"
-                            android:layout_marginTop="20dp"
-                            android:layout_width="match_parent"
-                            android:layout_height="54dp"
+                            android:layout_marginTop="18dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="46dp"
+                            android:minWidth="180dp"
+                            android:paddingStart="22dp"
+                            android:paddingEnd="22dp"
                             android:text="@string/btn_start"
-                            android:textSize="15sp"
+                            android:textSize="14sp"
                             android:fontFamily="sans-serif-medium"
                             android:textAllCaps="false"
                             android:letterSpacing="0.04"
-                            app:cornerRadius="16dp"
-                            app:backgroundTint="@color/brand_primary" />
+                            app:cornerRadius="14dp"
+                            app:backgroundTint="@color/brand_primary"
+                            app:icon="@drawable/ic_rocket"
+                            app:iconSize="18dp"
+                            app:iconTint="#FFFFFF"
+                            app:iconGravity="textStart" />
 
                         <ProgressBar
                             android:id="@+id/progressShare"

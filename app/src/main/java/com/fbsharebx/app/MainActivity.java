@@ -22,7 +22,6 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.navigation.NavigationView;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -37,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private View resultCard;
     private ImageView resultIcon;
     private TextView resultTitle, resultSubtitle, resultBadge, resultMessage;
+    private TextView statDownloads, statVersion;
     private LinearLayout metricsRow;
 
     @Override
@@ -62,17 +62,12 @@ public class MainActivity extends AppCompatActivity {
         resultBadge = findViewById(R.id.resultBadge);
         resultMessage = findViewById(R.id.resultMessage);
         metricsRow = findViewById(R.id.metricsRow);
+        statDownloads = findViewById(R.id.statDownloads);
+        statVersion = findViewById(R.id.statVersion);
+
+        statVersion.setText("v" + BuildConfig.VERSION_NAME);
 
         toolbar.setNavigationOnClickListener(v -> drawer.openDrawer(GravityCompat.START));
-
-        // Theme switch lives in the drawer header (NOT a menu actionLayout) -- bullet-proof
-        View header = nav.getHeaderView(0);
-        final MaterialSwitch sw = header.findViewById(R.id.headerThemeSwitch);
-        final View themeRow = header.findViewById(R.id.headerThemeRow);
-        sw.setOnCheckedChangeListener(null);
-        sw.setChecked(ThemeManager.isDark(this));
-        sw.setOnCheckedChangeListener((b, checked) -> applyTheme(checked));
-        themeRow.setOnClickListener(v -> sw.setChecked(!sw.isChecked()));
 
         nav.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
@@ -86,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
                 openInfo(InfoActivity.PAGE_ABOUT);
             } else if (id == R.id.nav_update) {
                 UpdateChecker.check(this, true);
+                refreshStats();
             }
             drawer.closeDrawer(GravityCompat.START);
             return true;
@@ -94,18 +90,30 @@ public class MainActivity extends AppCompatActivity {
         btnStart.setOnClickListener(v -> startShare());
         swipe.setOnRefreshListener(() -> {
             swipe.setRefreshing(false);
+            refreshStats();
             UpdateChecker.check(this, false);
         });
 
+        refreshStats();
         new Handler(Looper.getMainLooper()).postDelayed(
                 () -> UpdateChecker.check(this, false), 1500);
     }
 
-    private void applyTheme(boolean dark) {
-        if (dark == ThemeManager.isDark(this)) return;
-        ThemeManager.setDark(this, dark);
-        if (drawer.isDrawerOpen(GravityCompat.START)) drawer.closeDrawer(GravityCompat.START);
-        new Handler(Looper.getMainLooper()).postDelayed(this::recreate, 200);
+    private void refreshStats() {
+        UpdateChecker.fetchStats((version, total) -> {
+            statVersion.setText(version);
+            statDownloads.setText(formatNumber(total));
+        });
+    }
+
+    private static String formatNumber(long n) {
+        if (n < 1000) return String.valueOf(n);
+        if (n < 1_000_000) {
+            double k = n / 1000.0;
+            return (k >= 10 ? String.valueOf((int) k) : String.format("%.1f", k)) + "K";
+        }
+        double m = n / 1_000_000.0;
+        return (m >= 10 ? String.valueOf((int) m) : String.format("%.1f", m)) + "M";
     }
 
     private void openInfo(int page) {

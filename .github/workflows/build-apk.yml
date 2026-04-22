@@ -16,6 +16,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Compute version
+        id: ver
+        run: |
+          BUILD_NUMBER=${{ github.run_number }}
+          VERSION_NAME="1.0.${BUILD_NUMBER}"
+          echo "build_number=${BUILD_NUMBER}" >> "$GITHUB_OUTPUT"
+          echo "version_name=${VERSION_NAME}" >> "$GITHUB_OUTPUT"
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -29,10 +37,10 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build Debug APK
-        run: ./gradlew assembleDebug --no-daemon --stacktrace
+        run: ./gradlew assembleDebug -PbuildNumber=${{ steps.ver.outputs.build_number }} -PappVersionName=${{ steps.ver.outputs.version_name }} --no-daemon --stacktrace
 
       - name: Build Release APK
-        run: ./gradlew assembleRelease --no-daemon --stacktrace
+        run: ./gradlew assembleRelease -PbuildNumber=${{ steps.ver.outputs.build_number }} -PappVersionName=${{ steps.ver.outputs.version_name }} --no-daemon --stacktrace
 
       - name: Rename APKs
         run: |
@@ -56,8 +64,13 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: latest
-          name: FB SHARE BX (latest build)
+          name: FB SHARE BX v${{ steps.ver.outputs.version_name }}
           body: |
+            **FB SHARE BX v${{ steps.ver.outputs.version_name }}**
+
+            version=${{ steps.ver.outputs.version_name }}
+            build=${{ steps.ver.outputs.build_number }}
+
             Automatic build from commit ${{ github.sha }}.
             Install the release APK on Android (enable "Install unknown apps").
           files: |

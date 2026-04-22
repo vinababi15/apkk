@@ -2,6 +2,9 @@ plugins {
     id 'com.android.application'
 }
 
+def buildNumber = (project.findProperty("buildNumber") ?: "1").toString().toInteger()
+def appVersionName = project.findProperty("appVersionName") ?: "1.0.${buildNumber}"
+
 android {
     namespace 'com.fbsharebx.app'
     compileSdk 34
@@ -10,8 +13,8 @@ android {
         applicationId "com.fbsharebx.app"
         minSdk 21
         targetSdk 34
-        versionCode 1
-        versionName "1.0.0"
+        versionCode buildNumber
+        versionName appVersionName
         vectorDrawables.useSupportLibrary = true
     }
 
