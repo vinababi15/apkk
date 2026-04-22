@@ -8,7 +8,6 @@ import android.os.Looper;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -66,21 +65,14 @@ public class MainActivity extends AppCompatActivity {
 
         toolbar.setNavigationOnClickListener(v -> drawer.openDrawer(GravityCompat.START));
 
-        // Theme switch inside the drawer menu
-        MenuItem themeItem = nav.getMenu().findItem(R.id.nav_theme);
-        final View actionView = themeItem.getActionView();
-        if (actionView instanceof MaterialSwitch) {
-            final MaterialSwitch sw = (MaterialSwitch) actionView;
-            // Set state WITHOUT firing the listener to avoid recreate() loop
-            sw.setOnCheckedChangeListener(null);
-            sw.setChecked(ThemeManager.isDark(this));
-            sw.setOnCheckedChangeListener((b, checked) -> {
-                if (checked == ThemeManager.isDark(this)) return;
-                ThemeManager.setDark(this, checked);
-                drawer.closeDrawer(GravityCompat.START);
-                new Handler(Looper.getMainLooper()).postDelayed(this::recreate, 220);
-            });
-        }
+        // Theme switch lives in the drawer header (NOT a menu actionLayout) -- bullet-proof
+        View header = nav.getHeaderView(0);
+        final MaterialSwitch sw = header.findViewById(R.id.headerThemeSwitch);
+        final View themeRow = header.findViewById(R.id.headerThemeRow);
+        sw.setOnCheckedChangeListener(null);
+        sw.setChecked(ThemeManager.isDark(this));
+        sw.setOnCheckedChangeListener((b, checked) -> applyTheme(checked));
+        themeRow.setOnClickListener(v -> sw.setChecked(!sw.isChecked()));
 
         nav.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
@@ -94,13 +86,6 @@ public class MainActivity extends AppCompatActivity {
                 openInfo(InfoActivity.PAGE_ABOUT);
             } else if (id == R.id.nav_update) {
                 UpdateChecker.check(this, true);
-            } else if (id == R.id.nav_theme) {
-                // Allow tapping the row itself to also toggle the switch
-                if (actionView instanceof MaterialSwitch) {
-                    MaterialSwitch sw = (MaterialSwitch) actionView;
-                    sw.setChecked(!sw.isChecked());
-                }
-                return true;
             }
             drawer.closeDrawer(GravityCompat.START);
             return true;
@@ -114,6 +99,13 @@ public class MainActivity extends AppCompatActivity {
 
         new Handler(Looper.getMainLooper()).postDelayed(
                 () -> UpdateChecker.check(this, false), 1500);
+    }
+
+    private void applyTheme(boolean dark) {
+        if (dark == ThemeManager.isDark(this)) return;
+        ThemeManager.setDark(this, dark);
+        if (drawer.isDrawerOpen(GravityCompat.START)) drawer.closeDrawer(GravityCompat.START);
+        new Handler(Looper.getMainLooper()).postDelayed(this::recreate, 200);
     }
 
     private void openInfo(int page) {
@@ -179,61 +171,68 @@ public class MainActivity extends AppCompatActivity {
         metricsRow.removeAllViews();
 
         if (err != null) {
-            applyError("Network Error", "Couldn't reach the server", "ERR", err);
+            applyError("Connection Failed",
+                    "We couldn't reach the server",
+                    "Offline",
+                    "Please check your internet connection and try again. The server might also be temporarily unavailable.");
             return;
         }
 
-        // Try parse JSON
         boolean success = httpCode >= 200 && httpCode < 300;
-        String message = body == null ? "" : body.trim();
         Integer countShared = null;
-        String statusText = null;
+        String humanMsg = null;
 
-        try {
-            Object parsed = parse(message);
-            if (parsed instanceof JSONObject) {
-                JSONObject o = (JSONObject) parsed;
-                statusText = firstString(o, "status", "result", "state");
-                if (statusText != null) {
-                    String s = statusText.toLowerCase();
-                    if (s.contains("fail") || s.contains("error") || s.contains("invalid")) success = false;
-                    if (s.contains("success") || s.equals("ok") || s.equals("true")) success = true;
-                }
-                if (o.has("success")) success = o.optBoolean("success", success);
-                Integer n = firstInt(o, "count", "shared", "total", "amount", "shares");
-                if (n != null) countShared = n;
-                String msg = firstString(o, "message", "msg", "description", "info");
-                if (msg != null) message = msg;
-            } else if (parsed instanceof JSONArray) {
-                countShared = ((JSONArray) parsed).length();
-                message = "Received " + countShared + " items.";
+        Object parsed = parse(body);
+        if (parsed instanceof JSONObject) {
+            JSONObject o = (JSONObject) parsed;
+            String statusText = firstString(o, "status", "result", "state");
+            if (statusText != null) {
+                String s = statusText.toLowerCase();
+                if (s.contains("fail") || s.contains("error") || s.contains("invalid") || s.contains("expired")) success = false;
+                if (s.contains("success") || s.equals("ok") || s.equals("true")) success = true;
             }
-        } catch (Exception ignored) {}
+            if (o.has("success")) success = o.optBoolean("success", success);
+            countShared = firstInt(o, "count", "shared", "total", "amount", "shares", "success_count");
+            humanMsg = firstString(o, "message", "msg", "description", "info", "detail", "error");
+        } else if (parsed instanceof JSONArray) {
+            countShared = ((JSONArray) parsed).length();
+        }
 
         if (success) {
-            applySuccess(httpCode, countShared, limit, link, message);
+            applySuccess(httpCode, countShared, limit, humanMsg);
         } else {
-            applyError("Request Failed",
-                    "The server rejected the request",
-                    httpCode > 0 ? ("HTTP " + httpCode) : "ERR",
-                    message);
+            String niceErr = humanMsg;
+            if (TextUtils.isEmpty(niceErr)) {
+                niceErr = "The server rejected your request. This usually means the cookie is expired or the post link is invalid. Please double-check both and try again.";
+            }
+            applyError("Sharing Failed",
+                    "The server didn't accept the request",
+                    httpCode > 0 ? ("HTTP " + httpCode) : "Error",
+                    niceErr);
         }
     }
 
-    private void applySuccess(int httpCode, Integer count, String limit, String link, String detail) {
+    private void applySuccess(int httpCode, Integer count, String limit, String detail) {
         resultIcon.setImageResource(R.drawable.ic_check_circle);
         resultTitle.setText("Sharing Started");
-        resultSubtitle.setText("Your request was accepted by the server");
-        resultBadge.setText("HTTP " + httpCode);
+        resultSubtitle.setText("Your job is now running on the server");
+        resultBadge.setText("Success");
         resultBadge.setBackgroundResource(R.drawable.bg_pill_success);
         resultBadge.setTextColor(0xFF16A34A);
 
         addMetric("Shares", count != null ? String.valueOf(count) : (limit != null ? limit : "—"));
-        addMetric("Status", "OK");
+        addMetric("Status", "Active");
         addMetric("Mode", "Auto");
 
-        if (TextUtils.isEmpty(detail)) detail = "Your share job is now running. Sit back and watch the count climb.";
-        resultMessage.setText(detail);
+        String msg;
+        if (!TextUtils.isEmpty(detail) && !looksLikeJson(detail)) {
+            msg = capitalize(detail.trim());
+        } else if (count != null) {
+            msg = "Your post is now being shared " + count + " times. You can close the app, the job will keep running on the server.";
+        } else {
+            msg = "Your share request has been accepted. The shares will appear on your post in a few moments.";
+        }
+        resultMessage.setText(msg);
         resultMessage.setTextColor(getOnSurface());
     }
 
@@ -245,10 +244,24 @@ public class MainActivity extends AppCompatActivity {
         resultBadge.setBackgroundResource(R.drawable.bg_pill_error);
         resultBadge.setTextColor(0xFFDC2626);
         addMetric("Result", "Failed");
-        addMetric("Retry", "Yes");
-        if (TextUtils.isEmpty(detail)) detail = "Please verify your cookie, the post link, and the limit value, then try again.";
-        resultMessage.setText(detail);
+        addMetric("Action", "Retry");
+
+        String msg = (!TextUtils.isEmpty(detail) && !looksLikeJson(detail))
+                ? capitalize(detail.trim())
+                : "Please verify your cookie, the post link, and the limit value, then try again.";
+        resultMessage.setText(msg);
         resultMessage.setTextColor(getOnSurface());
+    }
+
+    private static boolean looksLikeJson(String s) {
+        if (s == null) return false;
+        String t = s.trim();
+        return t.startsWith("{") || t.startsWith("[");
+    }
+
+    private static String capitalize(String s) {
+        if (s == null || s.isEmpty()) return s;
+        return Character.toUpperCase(s.charAt(0)) + s.substring(1);
     }
 
     private int getOnSurface() {
@@ -261,7 +274,7 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout col = new LinearLayout(this);
         col.setOrientation(LinearLayout.VERTICAL);
         col.setBackgroundResource(R.drawable.bg_metric);
-        col.setPadding(dp(12), dp(10), dp(12), dp(10));
+        col.setPadding(dp(12), dp(12), dp(12), dp(12));
         col.setGravity(Gravity.CENTER);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0,
                 ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
@@ -270,7 +283,7 @@ public class MainActivity extends AppCompatActivity {
 
         TextView v = new TextView(this);
         v.setText(value);
-        v.setTextSize(18);
+        v.setTextSize(17);
         v.setTypeface(Typeface.create("sans-serif-black", Typeface.BOLD));
         v.setTextColor(getOnSurface());
         v.setGravity(Gravity.CENTER);
@@ -300,15 +313,17 @@ public class MainActivity extends AppCompatActivity {
         for (String k : keys) {
             if (o.has(k)) {
                 Object v = o.opt(k);
-                if (v != null && !(v instanceof JSONObject) && !(v instanceof JSONArray)) return String.valueOf(v);
+                if (v != null && !(v instanceof JSONObject) && !(v instanceof JSONArray)) {
+                    String s = String.valueOf(v).trim();
+                    if (!s.isEmpty() && !s.equalsIgnoreCase("null")) return s;
+                }
             }
         }
-        // fallback: any string value
         Iterator<String> it = o.keys();
         while (it.hasNext()) {
             String k = it.next();
             Object v = o.opt(k);
-            if (v instanceof String && ((String) v).length() < 200) return (String) v;
+            if (v instanceof String && ((String) v).length() < 200 && !((String) v).trim().isEmpty()) return (String) v;
         }
         return null;
     }

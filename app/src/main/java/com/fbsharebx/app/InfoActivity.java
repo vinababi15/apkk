@@ -168,14 +168,14 @@ public class InfoActivity extends AppCompatActivity {
 
         ImageView avatar = new ImageView(this);
         avatar.setImageResource(R.mipmap.ic_launcher_round);
-        LinearLayout.LayoutParams alp = new LinearLayout.LayoutParams(dp(88), dp(88));
+        LinearLayout.LayoutParams alp = new LinearLayout.LayoutParams(dp(56), dp(56));
         alp.setMargins(0, 0, 0, dp(10));
         avatar.setLayoutParams(alp);
         hero.addView(avatar);
 
         TextView name = new TextView(this);
         name.setText("notfound500");
-        name.setTextSize(20);
+        name.setTextSize(18);
         name.setTypeface(Typeface.create("sans-serif-black", Typeface.BOLD));
         name.setTextColor(0xFFFFFFFF);
         name.setGravity(Gravity.CENTER);
@@ -214,14 +214,14 @@ public class InfoActivity extends AppCompatActivity {
 
         ImageView ic = new ImageView(this);
         ic.setImageResource(R.mipmap.ic_launcher);
-        LinearLayout.LayoutParams alp = new LinearLayout.LayoutParams(dp(72), dp(72));
+        LinearLayout.LayoutParams alp = new LinearLayout.LayoutParams(dp(48), dp(48));
         alp.setMargins(0, 0, 0, dp(10));
         ic.setLayoutParams(alp);
         hero.addView(ic);
 
         TextView name = new TextView(this);
         name.setText(getString(R.string.app_name));
-        name.setTextSize(20);
+        name.setTextSize(18);
         name.setTypeface(Typeface.create("sans-serif-black", Typeface.BOLD));
         name.setTextColor(0xFFFFFFFF);
         name.setGravity(Gravity.CENTER);
