@@ -18,6 +18,7 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@drawable/bg_header"
             app:title="@string/app_name"
+            app:titleCentered="true"
             app:titleTextColor="#FFFFFF"
             app:titleTextAppearance="@style/Title.AppBar"
             app:navigationIcon="@android:drawable/ic_menu_sort_by_size"
@@ -38,111 +39,119 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="20dp">
+                    android:gravity="center_horizontal"
+                    android:padding="16dp">
 
+                    <!-- Share panel -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:background="@drawable/bg_card"
-                        android:padding="22dp"
-                        android:elevation="4dp">
+                        android:paddingStart="18dp"
+                        android:paddingEnd="18dp"
+                        android:paddingTop="20dp"
+                        android:paddingBottom="20dp"
+                        android:elevation="3dp"
+                        android:gravity="center_horizontal">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/app_name"
-                            android:textSize="22sp"
+                            android:textSize="20sp"
+                            android:gravity="center"
                             android:textColor="?attr/colorOnSurface"
                             android:fontFamily="sans-serif-black"
-                            android:letterSpacing="0.04" />
+                            android:letterSpacing="0.05" />
 
                         <TextView
-                            android:layout_marginTop="4dp"
+                            android:layout_marginTop="2dp"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Enter your details below to start sharing."
-                            android:textSize="13sp"
+                            android:text="Fill in the fields to start sharing."
+                            android:textSize="12sp"
+                            android:gravity="center"
                             android:fontFamily="sans-serif"
-                            android:textColor="#8A92A6" />
+                            android:textColor="?attr/colorOnSurfaceVariant" />
 
                         <EditText
                             android:id="@+id/inputCookie"
-                            android:layout_marginTop="20dp"
+                            android:layout_marginTop="18dp"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="@string/hint_cookie"
                             android:background="@drawable/bg_input"
-                            android:padding="14dp"
-                            android:textSize="14sp"
+                            android:padding="12dp"
+                            android:textSize="13sp"
                             android:fontFamily="sans-serif"
                             android:textColor="?attr/colorOnSurface"
-                            android:textColorHint="#8A92A6"
+                            android:textColorHint="?attr/colorOnSurfaceVariant"
                             android:inputType="textMultiLine"
                             android:minLines="2"
-                            android:maxLines="4" />
+                            android:maxLines="3" />
 
                         <EditText
                             android:id="@+id/inputLink"
-                            android:layout_marginTop="12dp"
+                            android:layout_marginTop="10dp"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="@string/hint_link"
                             android:background="@drawable/bg_input"
-                            android:padding="14dp"
-                            android:textSize="14sp"
+                            android:padding="12dp"
+                            android:textSize="13sp"
                             android:fontFamily="sans-serif"
                             android:textColor="?attr/colorOnSurface"
-                            android:textColorHint="#8A92A6"
+                            android:textColorHint="?attr/colorOnSurfaceVariant"
                             android:inputType="textUri" />
 
                         <EditText
                             android:id="@+id/inputLimit"
-                            android:layout_marginTop="12dp"
+                            android:layout_marginTop="10dp"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="@string/hint_limit"
                             android:background="@drawable/bg_input"
-                            android:padding="14dp"
-                            android:textSize="14sp"
+                            android:padding="12dp"
+                            android:textSize="13sp"
                             android:fontFamily="sans-serif"
                             android:textColor="?attr/colorOnSurface"
-                            android:textColorHint="#8A92A6"
+                            android:textColorHint="?attr/colorOnSurfaceVariant"
                             android:inputType="number" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnStart"
-                            android:layout_marginTop="22dp"
-                            android:layout_width="match_parent"
-                            android:layout_height="56dp"
+                            android:layout_marginTop="16dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="46dp"
+                            android:minWidth="200dp"
                             android:text="@string/btn_start"
-                            android:textSize="15sp"
+                            android:textSize="14sp"
                             android:fontFamily="sans-serif-medium"
                             android:textAllCaps="false"
-                            android:letterSpacing="0.03"
-                            app:cornerRadius="16dp"
+                            android:letterSpacing="0.04"
+                            app:cornerRadius="14dp"
                             app:backgroundTint="@color/brand_primary" />
 
                         <ProgressBar
                             android:id="@+id/progressShare"
                             android:visibility="gone"
-                            android:layout_marginTop="14dp"
-                            android:layout_gravity="center"
-                            android:layout_width="32dp"
-                            android:layout_height="32dp" />
+                            android:layout_marginTop="10dp"
+                            android:layout_width="26dp"
+                            android:layout_height="26dp" />
                     </LinearLayout>
 
                     <!-- Result card -->
                     <LinearLayout
                         android:id="@+id/resultCard"
                         android:visibility="gone"
-                        android:layout_marginTop="18dp"
+                        android:layout_marginTop="14dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:background="@drawable/bg_card"
-                        android:padding="20dp"
-                        android:elevation="4dp">
+                        android:padding="16dp"
+                        android:elevation="3dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -152,12 +161,12 @@
 
                             <ImageView
                                 android:id="@+id/resultIcon"
-                                android:layout_width="40dp"
-                                android:layout_height="40dp"
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
                                 android:src="@drawable/ic_check_circle" />
 
                             <LinearLayout
-                                android:layout_marginStart="14dp"
+                                android:layout_marginStart="12dp"
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
                                 android:layout_height="wrap_content"
@@ -168,7 +177,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Success"
-                                    android:textSize="18sp"
+                                    android:textSize="16sp"
                                     android:fontFamily="sans-serif-black"
                                     android:textColor="?attr/colorOnSurface" />
 
@@ -177,19 +186,20 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Request completed"
-                                    android:textSize="12sp"
+                                    android:textSize="11sp"
                                     android:fontFamily="sans-serif"
-                                    android:textColor="#8A92A6" />
+                                    android:textColor="?attr/colorOnSurfaceVariant" />
                             </LinearLayout>
 
                             <TextView
                                 android:id="@+id/resultBadge"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:padding="8dp"
-                                android:paddingStart="12dp"
-                                android:paddingEnd="12dp"
-                                android:textSize="11sp"
+                                android:paddingStart="10dp"
+                                android:paddingEnd="10dp"
+                                android:paddingTop="6dp"
+                                android:paddingBottom="6dp"
+                                android:textSize="10sp"
                                 android:fontFamily="sans-serif-medium"
                                 android:text="200 OK"
                                 android:textColor="#16A34A"
@@ -198,18 +208,18 @@
 
                         <LinearLayout
                             android:id="@+id/metricsRow"
-                            android:layout_marginTop="16dp"
+                            android:layout_marginTop="14dp"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal" />
 
                         <TextView
                             android:id="@+id/resultMessage"
-                            android:layout_marginTop="14dp"
+                            android:layout_marginTop="12dp"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:textSize="13sp"
-                            android:lineSpacingExtra="3dp"
+                            android:textSize="12sp"
+                            android:lineSpacingExtra="2dp"
                             android:fontFamily="sans-serif"
                             android:textColor="?attr/colorOnSurface" />
                     </LinearLayout>

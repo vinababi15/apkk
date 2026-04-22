@@ -68,13 +68,17 @@ public class MainActivity extends AppCompatActivity {
 
         // Theme switch inside the drawer menu
         MenuItem themeItem = nav.getMenu().findItem(R.id.nav_theme);
-        View actionView = themeItem.getActionView();
+        final View actionView = themeItem.getActionView();
         if (actionView instanceof MaterialSwitch) {
-            MaterialSwitch sw = (MaterialSwitch) actionView;
+            final MaterialSwitch sw = (MaterialSwitch) actionView;
+            // Set state WITHOUT firing the listener to avoid recreate() loop
+            sw.setOnCheckedChangeListener(null);
             sw.setChecked(ThemeManager.isDark(this));
             sw.setOnCheckedChangeListener((b, checked) -> {
+                if (checked == ThemeManager.isDark(this)) return;
                 ThemeManager.setDark(this, checked);
-                recreate();
+                drawer.closeDrawer(GravityCompat.START);
+                new Handler(Looper.getMainLooper()).postDelayed(this::recreate, 220);
             });
         }
 

@@ -1,6 +1,7 @@
 package com.fbsharebx.app;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -52,27 +53,27 @@ public class InfoActivity extends AppCompatActivity {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, v, getResources().getDisplayMetrics());
     }
 
+    private int onSurface() {
+        TypedValue tv = new TypedValue();
+        getTheme().resolveAttribute(com.google.android.material.R.attr.colorOnSurface, tv, true);
+        return tv.data;
+    }
+
     private TextView heading(String text) {
         TextView t = new TextView(this);
         t.setText(text);
-        t.setTextSize(22);
-        t.setTypeface(Typeface.DEFAULT_BOLD);
-        t.setTextColor(getColor(android.R.color.white));
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        lp.setMargins(0, 0, 0, dp(4));
-        t.setLayoutParams(lp);
+        t.setTextSize(20);
+        t.setTypeface(Typeface.create("sans-serif-black", Typeface.BOLD));
+        t.setTextColor(0xFFFFFFFF);
+        t.setLetterSpacing(0.04f);
         return t;
     }
 
     private TextView subtitle(String text) {
         TextView t = new TextView(this);
         t.setText(text);
-        t.setTextSize(13);
+        t.setTextSize(12);
         t.setTextColor(0xCCFFFFFF);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        t.setLayoutParams(lp);
         return t;
     }
 
@@ -80,73 +81,85 @@ public class InfoActivity extends AppCompatActivity {
         LinearLayout card = new LinearLayout(this);
         card.setOrientation(LinearLayout.VERTICAL);
         card.setBackgroundResource(R.drawable.bg_header);
-        card.setPadding(dp(20), dp(24), dp(20), dp(24));
+        card.setPadding(dp(18), dp(20), dp(18), dp(20));
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        lp.setMargins(0, 0, 0, dp(16));
+        lp.setMargins(0, 0, 0, dp(14));
         card.setLayoutParams(lp);
         return card;
     }
 
-    private View featureRow(String emojiBadge, String title, String desc) {
+    private View row(int iconRes, String title, String desc) {
         LinearLayout row = new LinearLayout(this);
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setBackgroundResource(R.drawable.bg_card);
-        row.setPadding(dp(16), dp(16), dp(16), dp(16));
+        row.setPadding(dp(14), dp(14), dp(14), dp(14));
         row.setGravity(Gravity.CENTER_VERTICAL);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        lp.setMargins(0, 0, 0, dp(12));
+        lp.setMargins(0, 0, 0, dp(10));
         row.setLayoutParams(lp);
         row.setElevation(dp(2));
 
-        TextView badge = new TextView(this);
-        badge.setText(emojiBadge);
-        badge.setTextSize(20);
-        badge.setBackgroundResource(R.drawable.bg_metric);
-        badge.setGravity(Gravity.CENTER);
-        LinearLayout.LayoutParams blp = new LinearLayout.LayoutParams(dp(48), dp(48));
-        blp.setMarginEnd(dp(14));
-        badge.setLayoutParams(blp);
+        // Icon tile
+        LinearLayout tile = new LinearLayout(this);
+        tile.setBackgroundResource(R.drawable.bg_metric);
+        tile.setGravity(Gravity.CENTER);
+        LinearLayout.LayoutParams tlp = new LinearLayout.LayoutParams(dp(44), dp(44));
+        tlp.setMarginEnd(dp(12));
+        tile.setLayoutParams(tlp);
+
+        ImageView icon = new ImageView(this);
+        icon.setImageResource(iconRes);
+        icon.setImageTintList(ColorStateList.valueOf(getColor(R.color.brand_primary)));
+        LinearLayout.LayoutParams ilp = new LinearLayout.LayoutParams(dp(22), dp(22));
+        icon.setLayoutParams(ilp);
+        tile.addView(icon);
 
         LinearLayout col = new LinearLayout(this);
         col.setOrientation(LinearLayout.VERTICAL);
         col.setLayoutParams(new LinearLayout.LayoutParams(0,
                 ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+
         TextView t = new TextView(this);
         t.setText(title);
-        t.setTextSize(15);
+        t.setTextSize(14);
         t.setTypeface(Typeface.create("sans-serif-medium", Typeface.BOLD));
-        t.setTextColor(getResources().getColor(android.R.color.darker_gray, getTheme()));
-        t.setTextColor(0xFF111827);
-        TypedValue tv = new TypedValue();
-        getTheme().resolveAttribute(android.R.attr.textColorPrimary, tv, true);
-        t.setTextColor(tv.data);
+        t.setTextColor(onSurface());
+
         TextView d = new TextView(this);
         d.setText(desc);
         d.setTextSize(12);
         d.setTextColor(0xFF8A92A6);
+        d.setLineSpacing(dp(2), 1f);
+
         col.addView(t);
         col.addView(d);
-
-        row.addView(badge);
+        row.addView(tile);
         row.addView(col);
         return row;
     }
 
     private void buildFeatures(LinearLayout c) {
         LinearLayout hero = heroCard();
-        hero.addView(heading("What's inside"));
-        hero.addView(subtitle("Everything you need to power up your share game."));
+        hero.addView(heading("Everything inside"));
+        hero.addView(subtitle("A clean, focused toolkit for boosting your post shares."));
         c.addView(hero);
 
-        c.addView(featureRow("\uD83D\uDE80", "Auto Share", "Send hundreds of shares with one tap via vern-rest-api."));
-        c.addView(featureRow("\u2699\uFE0F",  "Custom Limit", "Pick any share count up to your account safety limit."));
-        c.addView(featureRow("\uD83C\uDF19", "Dark / Light", "A switch in the menu — match your vibe day and night."));
-        c.addView(featureRow("\uD83D\uDD04", "Auto Update", "App checks GitHub releases on launch and prompts to update."));
-        c.addView(featureRow("\uD83D\uDCCB", "Clean Result", "Pretty success card with response stats — no raw JSON."));
-        c.addView(featureRow("\uD83D\uDCBE", "Persistent", "Theme and preferences saved across restarts."));
-        c.addView(featureRow("\uD83D\uDD12", "Privacy", "No data leaves the device except your API request."));
+        c.addView(row(R.drawable.ic_rocket,    "Auto Sharing",
+                "Send hundreds of shares with a single tap, powered by the Vern API."));
+        c.addView(row(R.drawable.ic_tune,      "Custom Limit",
+                "Choose any share count you want, from a few to several thousand."));
+        c.addView(row(R.drawable.ic_moon,      "Light and Dark Mode",
+                "Flip the switch in the menu and the whole app changes instantly."));
+        c.addView(row(R.drawable.ic_refresh,   "Automatic Updates",
+                "The app checks GitHub on launch and prompts you when a new build is ready."));
+        c.addView(row(R.drawable.ic_clipboard, "Readable Results",
+                "Responses are parsed into a friendly card with status, count, and message."));
+        c.addView(row(R.drawable.ic_save,      "Saved Preferences",
+                "Your theme choice is remembered between launches."));
+        c.addView(row(R.drawable.ic_shield,    "Private by Default",
+                "Nothing leaves your device except the request you send to the API."));
     }
 
     private void buildDeveloper(LinearLayout c) {
@@ -155,38 +168,40 @@ public class InfoActivity extends AppCompatActivity {
 
         ImageView avatar = new ImageView(this);
         avatar.setImageResource(R.mipmap.ic_launcher_round);
-        LinearLayout.LayoutParams alp = new LinearLayout.LayoutParams(dp(96), dp(96));
-        alp.setMargins(0, 0, 0, dp(12));
+        LinearLayout.LayoutParams alp = new LinearLayout.LayoutParams(dp(88), dp(88));
+        alp.setMargins(0, 0, 0, dp(10));
         avatar.setLayoutParams(alp);
         hero.addView(avatar);
 
         TextView name = new TextView(this);
         name.setText("notfound500");
-        name.setTextSize(22);
-        name.setTypeface(Typeface.DEFAULT_BOLD);
+        name.setTextSize(20);
+        name.setTypeface(Typeface.create("sans-serif-black", Typeface.BOLD));
         name.setTextColor(0xFFFFFFFF);
         name.setGravity(Gravity.CENTER);
         hero.addView(name);
 
         TextView role = new TextView(this);
-        role.setText("Developer  •  Designer  •  Maintainer");
-        role.setTextSize(12);
+        role.setText("Developer  -  Designer  -  Maintainer");
+        role.setTextSize(11);
         role.setTextColor(0xCCFFFFFF);
         role.setGravity(Gravity.CENTER);
         hero.addView(role);
-
         c.addView(hero);
 
-        c.addView(featureRow("\uD83D\uDC65", "Facebook", "facebook.com/notfound500"));
-        c.addView(featureRow("\uD83D\uDCE6", "Repository", "github.com/vinababi15/apkk"));
-        c.addView(featureRow("\u2728", "Made with", "Java, Material 3, and a lot of coffee."));
+        c.addView(row(R.drawable.ic_person,  "Name",       "notfound500"));
+        c.addView(row(R.drawable.ic_link,    "Facebook",   "facebook.com/notfound500"));
+        c.addView(row(R.drawable.ic_code,    "Repository", "github.com/vinababi15/apkk"));
+        c.addView(row(R.drawable.ic_sparkle, "Built With", "Java, Material 3, OkHttp"));
 
         MaterialButton fb = new MaterialButton(this);
         fb.setText("Open Facebook Profile");
         fb.setCornerRadius(dp(14));
+        fb.setAllCaps(false);
+        fb.setTextSize(13);
         LinearLayout.LayoutParams flp = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, dp(54));
-        flp.setMargins(0, dp(8), 0, 0);
+                ViewGroup.LayoutParams.MATCH_PARENT, dp(50));
+        flp.setMargins(0, dp(6), 0, 0);
         fb.setLayoutParams(flp);
         fb.setOnClickListener(v -> startActivity(new Intent(Intent.ACTION_VIEW,
                 Uri.parse("https://www.facebook.com/notfound500"))));
@@ -199,32 +214,34 @@ public class InfoActivity extends AppCompatActivity {
 
         ImageView ic = new ImageView(this);
         ic.setImageResource(R.mipmap.ic_launcher);
-        LinearLayout.LayoutParams alp = new LinearLayout.LayoutParams(dp(80), dp(80));
+        LinearLayout.LayoutParams alp = new LinearLayout.LayoutParams(dp(72), dp(72));
         alp.setMargins(0, 0, 0, dp(10));
         ic.setLayoutParams(alp);
         hero.addView(ic);
 
         TextView name = new TextView(this);
         name.setText(getString(R.string.app_name));
-        name.setTextSize(22);
-        name.setTypeface(Typeface.DEFAULT_BOLD);
+        name.setTextSize(20);
+        name.setTypeface(Typeface.create("sans-serif-black", Typeface.BOLD));
         name.setTextColor(0xFFFFFFFF);
         name.setGravity(Gravity.CENTER);
         hero.addView(name);
 
         TextView ver = new TextView(this);
         ver.setText("Version " + BuildConfig.VERSION_NAME);
-        ver.setTextSize(12);
+        ver.setTextSize(11);
         ver.setTextColor(0xCCFFFFFF);
         ver.setGravity(Gravity.CENTER);
         hero.addView(ver);
         c.addView(hero);
 
-        c.addView(featureRow("\uD83D\uDCD6", "About",
-                "FB SHARE BX is a clean, modern Android client for the vern-rest-api auto-share endpoint."));
-        c.addView(featureRow("\u2696\uFE0F", "License",
-                "Provided as-is for educational purposes. Use responsibly."));
-        c.addView(featureRow("\uD83D\uDCAC", "Support",
-                "Reach the developer via the Facebook profile linked in the Developer page."));
+        c.addView(row(R.drawable.ic_book,    "About",
+                "FB SHARE BX is a clean, modern Android client for the vern-rest-api auto share endpoint."));
+        c.addView(row(R.drawable.ic_balance, "License",
+                "Provided as is for educational purposes. Use responsibly."));
+        c.addView(row(R.drawable.ic_chat,    "Support",
+                "Reach the developer through the Facebook profile listed on the Developer page."));
+        c.addView(row(R.drawable.ic_refresh, "Auto Update",
+                "The app polls GitHub releases for new versions and prompts you to install."));
     }
 }
