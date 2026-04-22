@@ -14,7 +14,13 @@ public class ApiClient {
         .writeTimeout(60, TimeUnit.SECONDS)
         .build();
 
-    public static String share(String cookie, String link, String limit) throws IOException {
+    public static class Result {
+        public final int code;
+        public final String body;
+        public Result(int c, String b) { this.code = c; this.body = b; }
+    }
+
+    public static Result shareWithCode(String cookie, String link, String limit) throws IOException {
         HttpUrl url = HttpUrl.parse("https://vern-rest-api.vercel.app/api/share")
             .newBuilder()
             .addQueryParameter("cookie", cookie == null ? "" : cookie)
@@ -28,7 +34,7 @@ public class ApiClient {
             .build();
         try (Response resp = client.newCall(req).execute()) {
             String body = resp.body() != null ? resp.body().string() : "";
-            return "HTTP " + resp.code() + "\n\n" + body;
+            return new Result(resp.code(), body);
         }
     }
 

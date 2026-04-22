@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_home"
@@ -14,16 +16,20 @@
             android:icon="@android:drawable/ic_menu_myplaces"
             android:title="@string/menu_developer" />
         <item
-            android:id="@+id/nav_theme"
-            android:icon="@android:drawable/ic_menu_day"
-            android:title="@string/menu_theme" />
+            android:id="@+id/nav_about"
+            android:icon="@android:drawable/ic_menu_help"
+            android:title="@string/menu_about" />
         <item
             android:id="@+id/nav_update"
             android:icon="@android:drawable/stat_sys_download"
             android:title="@string/menu_update" />
+    </group>
+
+    <group android:id="@+id/grp_settings">
         <item
-            android:id="@+id/nav_about"
-            android:icon="@android:drawable/ic_menu_help"
-            android:title="@string/menu_about" />
+            android:id="@+id/nav_theme"
+            android:icon="@android:drawable/ic_menu_day"
+            android:title="@string/menu_theme"
+            app:actionLayout="@layout/switch_action" />
     </group>
 </menu>

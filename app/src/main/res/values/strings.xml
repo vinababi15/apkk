@@ -11,7 +11,10 @@
     <string name="menu_home">Home</string>
     <string name="menu_features">Features</string>
     <string name="menu_developer">Developer</string>
-    <string name="menu_theme">Toggle Theme</string>
+    <string name="menu_theme">Dark Mode</string>
     <string name="menu_update">Check for Updates</string>
     <string name="menu_about">About</string>
+    <string name="title_features">Features</string>
+    <string name="title_developer">Developer</string>
+    <string name="title_about">About</string>
 </resources>

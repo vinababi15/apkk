@@ -9,18 +9,18 @@ public class ThemeManager {
     private static final String KEY_DARK = "dark_mode";
 
     public static void applySavedTheme(Context ctx) {
-        SharedPreferences sp = ctx.getSharedPreferences(PREF, Context.MODE_PRIVATE);
-        boolean dark = sp.getBoolean(KEY_DARK, false);
         AppCompatDelegate.setDefaultNightMode(
-            dark ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
+            isDark(ctx) ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
     }
 
-    public static boolean toggle(Context ctx) {
-        SharedPreferences sp = ctx.getSharedPreferences(PREF, Context.MODE_PRIVATE);
-        boolean dark = !sp.getBoolean(KEY_DARK, false);
-        sp.edit().putBoolean(KEY_DARK, dark).apply();
+    public static boolean isDark(Context ctx) {
+        return ctx.getSharedPreferences(PREF, Context.MODE_PRIVATE).getBoolean(KEY_DARK, false);
+    }
+
+    public static void setDark(Context ctx, boolean dark) {
+        ctx.getSharedPreferences(PREF, Context.MODE_PRIVATE)
+                .edit().putBoolean(KEY_DARK, dark).apply();
         AppCompatDelegate.setDefaultNightMode(
             dark ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
-        return dark;
     }
 }
